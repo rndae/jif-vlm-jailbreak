@@ -1,3 +1,8 @@
+from PIL import Image
+from typing import Optional, Union
+from ..models.falcon import FalconModel
+from ..models.domain import Question
+
 class SingletonMeta(type):
     """
     A singleton metaclass that ensures only one instance of a class is created.
@@ -10,20 +15,11 @@ class SingletonMeta(type):
             cls._instances[cls] = instance
         return cls._instances[cls]
 
-
-class FalconModel(metaclass=SingletonMeta):
-    """
-    Singleton class for the Falcon 3 model.
-    """
+class Falcon(metaclass=SingletonMeta):
     def __init__(self):
-        if not hasattr(self, 'initialized'):
-            self.initialize_model()
-            self.initialized = True
+        self._model = FalconModel()
 
-    def initialize_model(self):
-        # Code to load the Falcon 3 model goes here
-        pass
-
-    def generate_response(self, prompt):
-        # Code to generate a response based on the input prompt goes here
-        pass
+    def ask(self, text: str, image: Optional[Image.Image] = None, is_figstep: bool = False) -> str:
+        question = Question(text=text, image=image, is_figstep=is_figstep)
+        answer = self._model.generate_response(question)
+        return answer.text

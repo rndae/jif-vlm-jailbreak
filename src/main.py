@@ -1,17 +1,15 @@
-from utils.singleton import FalconSingleton
+from utils.singleton import Falcon
 
 def main():
-    # Initialize the singleton instance of the Falcon 3 model
-    falcon_model = FalconSingleton()
+    falcon = Falcon()
 
     while True:
-        user_input = input("Enter your prompt (or 'exit' to quit): ")
+        user_input = input("Enter your question (or 'exit' to quit): ")
         if user_input.lower() == 'exit':
             break
         
-        # Generate a response using the Falcon model
-        response = falcon_model.generate_response(user_input)
-        print("Response:", response)
+        response = falcon.ask(user_input)
+        print("Answer:", response)
 
 if __name__ == "__main__":
     main()
