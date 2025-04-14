@@ -15,15 +15,27 @@ def print_welcome():
         print("Could not load commands reference file.")
     print("=" * 30)
 
+def get_model_selection():
+    while True:
+        print("\nSelect model to load:")
+        print("1. Falcon")
+        print("2. Granite")
+        choice = input("Enter choice (1/2): ").strip()
+        if choice == "1":
+            return "falcon"
+        elif choice == "2":
+            return "granite"
+        print("Invalid choice, please try again")
+
 def main():
     print_welcome()
     
-    # Initialize model manager and command parser
+    model_type = get_model_selection()
+    
     model_manager = ModelManager()
-    model_manager.initialize()  # Load model once at startup
+    model_manager.initialize(model_type)
     parser = CommandParser(model_manager)
     
-    # Main command loop
     running = True
     while running:
         try:

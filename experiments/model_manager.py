@@ -8,17 +8,19 @@ class ModelManager:
         if cls._instance is None:
             cls._instance = super().__new__(cls)
             cls._instance._model = None
+            cls._instance._model_type = None
         return cls._instance
     
-    def initialize(self):
+    def initialize(self, model_type: str = "falcon"):
         """Initialize model if not already initialized"""
         if self._model is None:
-            print("\nInitializing Falcon model...")
+            self._model_type = model_type.lower()
+            print(f"\nInitializing {model_type} model...")
             try:
-                self._model = Falcon()
-                print("✓ Falcon model loaded successfully")
+                self._model = Falcon(model_type)
+                print(f"✓ {model_type} model loaded successfully")
             except Exception as e:
-                print(f"✗ Error loading Falcon model: {e}")
+                print(f"✗ Error loading {model_type} model: {e}")
                 raise
             print("Model initialization complete!")
     
