@@ -42,7 +42,7 @@ class GraniteModel:
             return_tensors="pt"
         ).to(self.device)
 
-        output = self.model.generate(**inputs, max_new_tokens=100)
+        output = self.model.generate(**inputs, max_new_tokens=200)
         response_text = self.processor.decode(output[0], skip_special_tokens=True)
 
         return Answer(
