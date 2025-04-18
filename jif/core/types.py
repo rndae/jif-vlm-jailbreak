@@ -12,19 +12,32 @@ class NoiseType(Enum):
 
 @dataclass
 class JamConfig:
-    syntactic_noise: float = 0.5
-    semantic_noise: bool = True
-    noise_type: NoiseType = NoiseType.STEGANOGRAPHIC
-    distribution: str = "pink"
-    num_trials: int = 5
-    point_density: float = 0.5
-    use_list_format: bool = False
-    extra_params: Optional[Dict[str, Any]] = None
+    # Separate noise levels for each type
+    semantic_noise_level: float = 0.5
+    syntactic_noise_level: float = 0.5
+    image_noise_level: float = 0.5
     
-    # Add new processor configuration
+    # Method selection
     semantic_method: str = "NONE"
     syntactic_method: str = "NONE"
     image_method: str = "NONE"
     
-    # For image replacement
+    # Legacy support properties
+    @property
+    def semantic_noise(self) -> bool:
+        return self.semantic_noise_level > 0
+        
+    @property
+    def syntactic_noise(self) -> float:
+        return self.syntactic_noise_level
+
+    @property
+    def image_noise(self) -> float:
+        return self.image_noise_level
+    
+    # Other settings
+    distribution: str = "pink"
+    point_density: float = 0.5
+    use_list_format: bool = False
+    extra_params: Optional[Dict[str, Any]] = None
     use_image_replace: bool = False

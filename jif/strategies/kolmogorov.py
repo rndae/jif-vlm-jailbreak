@@ -74,7 +74,7 @@ class KolmogorovNoise(NoiseStrategy):
 
     def apply(self, text: str, config: JamConfig) -> Image.Image:
         # Transform text using Kolmogorov noise
-        transformed_text = self._transform_text(text, config.syntactic_noise)
+        transformed_text = self._transform_text(text, config.syntactic_noise_level)
         
         # Show transformation for debugging
         print(f"Original text: {text}")
@@ -84,7 +84,7 @@ class KolmogorovNoise(NoiseStrategy):
         code_representation = f"""
 # Kolmogorov noise transformation:
 text = "{text}"
-noise_level = {config.syntactic_noise}
+noise_level = {config.syntactic_noise_level}
 transformed = apply_kolmogorov_noise(text)  # Result: {transformed_text}
 """
         

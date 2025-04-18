@@ -18,11 +18,11 @@ class NoiseGenerator:
         # Process text through pipeline
         processed_text = text
         
-        if self.config.semantic_noise:
+        if self.config.semantic_noise_level > 0:
             processed_text = semantic_proc.process(processed_text, self.config)
             logging.info(f"Applied semantic processing: {self.config.semantic_method}")
             
-        if self.config.syntactic_noise > 0:
+        if self.config.syntactic_noise_level > 0:
             processed_text = syntactic_proc.process(processed_text, self.config)
             logging.info(f"Applied syntactic processing: {self.config.syntactic_method}")
         

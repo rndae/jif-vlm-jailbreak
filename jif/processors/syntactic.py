@@ -44,8 +44,10 @@ class ShuffleProcessor(SyntacticProcessor):
             word = self._shuffle_word(word, config.syntactic_noise)
             
             result.append(word)
-            
-        return ' '.join(result)
+        
+        result_text = ' '.join(result)
+        print(f"Syntactic processing (Shuffle): {text} -> {result_text}")
+        return result_text
 
 class KolmogorovProcessor(SyntacticProcessor):
     """Uses Kolmogorov noise for text transformation"""
@@ -55,7 +57,9 @@ class KolmogorovProcessor(SyntacticProcessor):
     def process(self, text: str, config: JamConfig) -> str:
         if config.syntactic_noise <= 0:
             return text
-        return self.kolmogorov._transform_text(text, config.syntactic_noise)
+        result = self.kolmogorov._transform_text(text, config.syntactic_noise)
+        print(f"Syntactic processing (Kolmogorov): {text} -> {result}")
+        return result
 
 class NoneSyntacticProcessor(SyntacticProcessor):
     """Pass-through processor that makes no changes"""

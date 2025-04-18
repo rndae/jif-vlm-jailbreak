@@ -32,7 +32,7 @@ class PointCloudNoise(NoiseStrategy):
             
         # Add 3D coordinates
         num_points = len(points)
-        z = np.sin(points[:, 0] / 100) * 20 * config.syntactic_noise
+        z = np.sin(points[:, 0] / 100) * 20 * config.image_noise_level  # Use image noise
         points_3d = np.column_stack([points, z])
         
         # Generate colors based on 3D position

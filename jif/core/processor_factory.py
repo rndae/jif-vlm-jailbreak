@@ -3,13 +3,14 @@ from .processors import (
     TextProcessor, SemanticProcessor, SyntacticProcessor,
     ImageProcessor, DefaultImageProcessor
 )
-from ..processors.semantic import RegexSemanticProcessor, NoneSemanticProcessor
+from ..processors.semantic import RegexSemanticProcessor, NoneSemanticProcessor, LatentSpaceProcessor
 from ..processors.syntactic import KolmogorovProcessor, ShuffleProcessor, NoneSyntacticProcessor
 from ..processors.image import SpeckleProcessor, PointCloudProcessor, NoneImageProcessor
 
 class ProcessorFactory:
     _semantic_processors = {
         'REGEX': RegexSemanticProcessor,
+        'LATENT': LatentSpaceProcessor,
         'NONE': NoneSemanticProcessor,
     }
     

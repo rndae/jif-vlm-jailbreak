@@ -65,7 +65,7 @@ class SpeckleNoise(NoiseStrategy):
         
         # Apply uniform noise across the image
         noisy_img = np.clip(
-            img_array + noise * config.syntactic_noise * 127,  # Scale factor reduced for subtler effect
+            img_array + noise * config.image_noise_level * 127,  # Use image noise level
             0, 255
         ).astype(np.uint8)
         

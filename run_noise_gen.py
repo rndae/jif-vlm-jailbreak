@@ -46,20 +46,27 @@ def main():
     parser.add_argument('text', help='Text to render')
     
     # Method selection arguments
-    parser.add_argument('--semantic', choices=['REGEX', 'NONE'],
-                      default='NONE', help='Semantic noise method')
-    parser.add_argument('--syntactic', 
-                       choices=['KOLMOGOROV', 'SHUFFLE', 'NONE'],
+    parser.add_argument('--semantic', 
+                       choices=['REGEX', 'LATENT', 'NONE'],
                        default='NONE', 
-                       help='Syntactic noise method')
+                       help='Semantic noise method')
+    parser.add_argument('--syntactic', choices=['KOLMOGOROV', 'SHUFFLE', 'NONE'],
+                      default='NONE', help='Syntactic noise method')
     parser.add_argument('--image-noise', choices=['SPECKLE', 'POINT_CLOUD', 'NONE'],
                       default='NONE', help='Image noise method')
     
-    # Noise levels
-    parser.add_argument('--noise-level', type=float, default=0.5,
-                      help='Noise level (0.0-1.0)')
+    # Separate noise levels
+    parser.add_argument('--semantic-noise-lvl', type=float, default=0.5,
+                      help='Semantic noise level (0.0-1.0)')
+    parser.add_argument('--syntactic-noise-lvl', type=float, default=0.5,
+                      help='Syntactic noise level (0.0-1.0)')
+    parser.add_argument('--image-noise-lvl', type=float, default=0.5,
+                      help='Image noise level (0.0-1.0)')
     
-    # Image replacement
+    # Legacy support
+    parser.add_argument('--noise-level', type=float, default=None,
+                      help='Global noise level (deprecated, use specific levels instead)')
+    
     parser.add_argument('--image-replace', action='store_true',
                       help='Use image replacement mode')
     
@@ -71,6 +78,11 @@ def main():
                       help='Generate comparison across different methods')
     
     args = parser.parse_args()
+    
+    # Handle noise levels with precedence
+    semantic_level = args.semantic_noise_lvl if args.semantic_noise_lvl is not None else args.noise_level or 0.5
+    syntactic_level = args.syntactic_noise_lvl if args.syntactic_noise_lvl is not None else args.noise_level or 0.5
+    image_level = args.image_noise_lvl if args.image_noise_lvl is not None else args.noise_level or 0.5
     
     os.makedirs(args.output_dir, exist_ok=True)
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -130,7 +142,9 @@ def main():
     else:
         # Generate single image with specified settings
         config = JamConfig(
-            syntactic_noise=args.noise_level,
+            semantic_noise_level=semantic_level,
+            syntactic_noise_level=syntactic_level,
+            image_noise_level=image_level,
             semantic_method=args.semantic,
             syntactic_method=args.syntactic,
             image_method=args.image_noise,
