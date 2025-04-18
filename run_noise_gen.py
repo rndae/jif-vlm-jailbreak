@@ -77,6 +77,10 @@ def main():
     parser.add_argument('--compare-methods', action='store_true',
                       help='Generate comparison across different methods')
     
+    # Add steps option
+    parser.add_argument('--steps', action='store_true',
+                      help='Add numbered steps (1.-, 2.-, 3.-) after text processing')
+    
     args = parser.parse_args()
     
     # Handle noise levels with precedence
@@ -148,7 +152,8 @@ def main():
             semantic_method=args.semantic,
             syntactic_method=args.syntactic,
             image_method=args.image_noise,
-            use_image_replace=args.image_replace
+            use_image_replace=args.image_replace,
+            add_steps=args.steps  # Add steps configuration
         )
         generator = NoiseGenerator(config)
         img = generator.generate(args.text)

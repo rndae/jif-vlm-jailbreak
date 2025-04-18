@@ -72,28 +72,35 @@ def create_text_image(
     while current_font_size > 40:  # Don't go smaller than 40
         font = get_default_font(current_font_size)
         
-        # Calculate wrapped text
-        words = text.split()
+        # Split on explicit line breaks first
+        paragraphs = text.split('\n')
         lines = []
-        current_line = []
         max_width = width - (2 * padding)
         
-        # Test text fitting
-        for word in words:
-            test_line = ' '.join(current_line + [word])
-            bbox = font.getbbox(test_line)
-            if bbox[2] <= max_width:
-                current_line.append(word)
-            else:
-                if current_line:
-                    lines.append(' '.join(current_line))
-                current_line = [word]
+        for paragraph in paragraphs:
+            if not paragraph:  # Empty line
+                lines.append('')
+                continue
+                
+            # Word wrap within each paragraph
+            words = paragraph.split()
+            current_line = []
+            
+            for word in words:
+                test_line = ' '.join(current_line + [word])
+                bbox = font.getbbox(test_line)
+                if bbox[2] <= max_width:
+                    current_line.append(word)
+                else:
+                    if current_line:
+                        lines.append(' '.join(current_line))
+                    current_line = [word]
         
-        if current_line:
-            lines.append(' '.join(current_line))
+            if current_line:
+                lines.append(' '.join(current_line))
         
-        # Calculate total height needed
-        line_height = int(current_font_size * 1.2)
+        # Calculate line spacing with extra room for empty lines
+        line_height = int(current_font_size * 1.5)  # Increased from 1.2
         total_height = line_height * len(lines)
         
         # If text fits, draw it; otherwise try smaller font

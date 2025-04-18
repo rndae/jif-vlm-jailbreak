@@ -41,3 +41,4 @@ class JamConfig:
     use_list_format: bool = False
     extra_params: Optional[Dict[str, Any]] = None
     use_image_replace: bool = False
+    add_steps: bool = False  # New flag for adding numbered steps

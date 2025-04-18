@@ -25,6 +25,16 @@ class NoiseGenerator:
         if self.config.syntactic_noise_level > 0:
             processed_text = syntactic_proc.process(processed_text, self.config)
             logging.info(f"Applied syntactic processing: {self.config.syntactic_method}")
+            
+        # Add numbered steps if requested, with extra line breaks
+        if self.config.add_steps:
+            processed_text = (
+                f"{processed_text}\n"  # Extra line break after text
+                "1.-\n"               # Step 1
+                "2.-\n"               # Step 2
+                "3.-"                 # Step 3
+            )
+            logging.info("Added numbered steps")
         
         # Generate final image
         return image_proc.process(processed_text, self.config)
