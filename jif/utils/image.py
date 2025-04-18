@@ -23,7 +23,13 @@ from PIL import Image, ImageFont
 
 def get_default_font(size: int = 40) -> ImageFont:
     """get default font for text rendering"""
-    return ImageFont.load_default()
+    try:
+        # Try to get system Arial font first
+        font_path = os.path.join(os.environ.get('SystemRoot', 'C:\\Windows'), 'Fonts', 'Arial.ttf')
+        return ImageFont.truetype(font_path, size)
+    except:
+        # Fallback to default, but scale up the size since default font is small
+        return ImageFont.load_default().font_variant(size=size * 3)
 
 def add_noise_to_image(img: np.ndarray, noise: np.ndarray, intensity: float) -> np.ndarray:
     """add noise to image with given intensity"""
@@ -49,36 +55,59 @@ def text_to_points(text: str, density: float = 0.5) -> np.ndarray:
     return np.array([[0, 0]])  # fallback
 
 def create_text_image(
-    text: str,
-    width: int = 800,
-    height: int = 400,
-    font_size: int = 40,
+    text: str, 
+    width: int = 800, 
+    height: int = 800,
+    font_size: int = 200,  # Much larger default font size
     bg_color: str = 'white',
-    text_color: str = 'black'
+    text_color: str = 'black',
+    padding: int = 12
 ) -> Image.Image:
-    """Create image with text centered and scaled to fit"""
+    """Create square image with text in a textbox format"""
     img = Image.new('RGB', (width, height), color=bg_color)
     draw = ImageDraw.Draw(img)
-    font = get_default_font(font_size)
     
-    # Calculate text size and position
-    bbox = font.getbbox(text)
-    text_width = bbox[2] - bbox[0]
-    text_height = bbox[3] - bbox[1]
+    # Start with large font size and adjust if needed
+    current_font_size = font_size
+    while current_font_size > 40:  # Don't go smaller than 40
+        font = get_default_font(current_font_size)
+        
+        # Calculate wrapped text
+        words = text.split()
+        lines = []
+        current_line = []
+        max_width = width - (2 * padding)
+        
+        # Test text fitting
+        for word in words:
+            test_line = ' '.join(current_line + [word])
+            bbox = font.getbbox(test_line)
+            if bbox[2] <= max_width:
+                current_line.append(word)
+            else:
+                if current_line:
+                    lines.append(' '.join(current_line))
+                current_line = [word]
+        
+        if current_line:
+            lines.append(' '.join(current_line))
+        
+        # Calculate total height needed
+        line_height = int(current_font_size * 1.2)
+        total_height = line_height * len(lines)
+        
+        # If text fits, draw it; otherwise try smaller font
+        if total_height <= height - (2 * padding):
+            y = padding
+            for line in lines:
+                bbox = font.getbbox(line)
+                x = padding
+                draw.text((x, y), line, font=font, fill=text_color)
+                y += line_height
+            break
+        
+        current_font_size = int(current_font_size * 0.8)
     
-    # Scale font size if text is too wide
-    if text_width > width * 0.9:
-        font_size = int(font_size * (width * 0.9) / text_width)
-        font = get_default_font(font_size)
-        bbox = font.getbbox(text)
-        text_width = bbox[2] - bbox[0]
-        text_height = bbox[3] - bbox[1]
-    
-    # Center text
-    x = (width - text_width) // 2
-    y = (height - text_height) // 2
-    
-    draw.text((x, y), text, font=font, fill=text_color)
     return img
 
 def add_noise_efficient(img: np.ndarray, noise_type: str = 'gaussian', intensity: float = 0.5) -> np.ndarray:

@@ -7,14 +7,15 @@ from ..utils.image import get_default_font
 class PointCloudNoise(NoiseStrategy):
     def _get_text_points(self, text: str, font: ImageFont.ImageFont) -> np.ndarray:
         """Get points that form the text"""
-        img = Image.new('L', (800, 200), color='white')
+        img = Image.new('L', (800, 800), color='white')  # Square dimensions
         draw = ImageDraw.Draw(img)
         
-        # Draw text centered
+        # Draw text with consistent padding
         bbox = font.getbbox(text)
         text_width = bbox[2] - bbox[0]
-        x = (800 - text_width) // 2
-        draw.text((x, 50), text, font=font, fill='black')
+        x = 12 if text_width > 776 else (800 - text_width) // 2  # 776 = 800 - 2*12
+        y = 12
+        draw.text((x, y), text, font=font, fill='black')
         
         # Convert to points
         pixels = np.array(img)

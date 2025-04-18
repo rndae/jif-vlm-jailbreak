@@ -19,5 +19,5 @@ class KolmogorovNoise(NoiseStrategy):
         code = self._generate_code(text)
         print(f"Kolmogorov transformation:\n{code}")
         
-        # Create image with code
-        return create_text_image(code, width=800, height=400)
+        # Create square image with code
+        return create_text_image(code, width=800, height=800)
