@@ -5,10 +5,10 @@ from PIL import Image
 from abc import ABC, abstractmethod
 from .model_manager import ModelManager
 import sys
+import time
 
 print("\nInitializing experiment environment...")
 
-# Add FigStep to Python path 
 figstep_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'FigStep'))
 if figstep_path not in sys.path:
     sys.path.append(figstep_path)
@@ -42,9 +42,13 @@ class PromptCommand(Command):
                 return
 
         print("Sending prompt to model...")
+        start_time = time.time()
         response = self.model_manager.get_model().ask(text, image=image, is_figstep=use_figstep)
+        end_time = time.time()
         
-        # Save output
+        elapsed_time = end_time - start_time
+        print(f"\nResponse time: {elapsed_time:.2f} seconds")
+        
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         output_file = os.path.join(self.output_dir, f"response_{timestamp}.txt")
         
@@ -52,6 +56,7 @@ class PromptCommand(Command):
             f.write(f"Prompt: {text}\n")
             f.write(f"Image: {image_path if image_path else 'None'}\n")
             f.write(f"FigStep: {use_figstep}\n")
+            f.write(f"Response time: {elapsed_time:.2f} seconds\n")  # Add timing to output file
             f.write("-" * 80 + "\n")
             f.write(response)
             
@@ -70,7 +75,6 @@ class FigStepCommand(Command):
         try:
             _, image = gen_query(QueryType.figstep, "", instruction)
             
-            # Save generated image
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
             image_path = os.path.join(self.output_dir, f"figstep_{timestamp}.png")
             image.save(image_path)
@@ -97,6 +101,14 @@ class CommandParser:
             if command == "exit":
                 return False
                 
+            elif command == "use":
+                if len(parts) > 1:
+                    model_name = parts[1].lower()
+                    self.model_manager.get_model().switch_model(model_name)
+                    print(f"Switched to {model_name} model")
+                else:
+                    print("Please specify a model name (falcon/granite)")
+                
             elif command == "prompt":
                 text = " ".join(parts[1:])
                 image_path = None
@@ -119,7 +131,7 @@ class CommandParser:
                 self.figstep_command.execute(instruction)
                 
             else:
-                print("Unknown command. Type 'exit' to quit.")
+                print("Unknown command. Available commands: prompt, use, figstep generate, exit")
                 
         except Exception as e:
             print(f"Error executing command: {e}")
