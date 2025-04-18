@@ -1,53 +1,30 @@
 from PIL import Image
-from typing import List, Optional, Tuple
-from .types import JamConfig, NoiseType
-from ..strategies.base import NoiseStrategy
-from ..strategies.factory import create_noise_strategy
-from ..utils.text import compute_complexity
+from typing import Optional
+from .types import JamConfig
+from .processor_factory import ProcessorFactory
 import logging
 
 class NoiseGenerator:
     def __init__(self, config: Optional[JamConfig] = None):
         self.config = config or JamConfig()
-        self._strategy = create_noise_strategy(self.config.noise_type)
         
-    def _process_text(self, text: str) -> Tuple[str, str]:
-        """Apply text-level transformations first"""
-        description = []
-        
-        # Apply semantic noise if enabled
-        if self.config.semantic_noise:
-            entropy = compute_complexity(text)
-            description.append(f"Text complexity score: {entropy:.2f}")
-            
-            # Add semantic transformations here if needed
-            
-        description = "\n".join(description)
-        return text, description
-
     def generate(self, text: str) -> Image.Image:
-        """Generate noisy image with text preprocessing"""
-        # Process text first
-        processed_text, desc = self._process_text(text)
-        if desc:
-            logging.info(f"Text processing:\n{desc}")
-            
-        # Apply visual noise strategy
-        return self._strategy.apply(processed_text, self.config)
-    
-    def best_trial(self, text: str, num_trials: int = 5) -> List[Image.Image]:
-        """generate multiple variations using different strategies"""
-        results = []
-        strategies = [
-            create_noise_strategy(noise_type) 
-            for noise_type in NoiseType
-        ]
+        """Generate noisy image using configured processors"""
+        # Get processors
+        semantic_proc = ProcessorFactory.get_semantic_processor(self.config.semantic_method)
+        syntactic_proc = ProcessorFactory.get_syntactic_processor(self.config.syntactic_method)
+        image_proc = ProcessorFactory.get_image_processor(self.config.image_method)
         
-        for strategy in strategies[:num_trials]:
-            try:
-                result = strategy.apply(text, self.config)
-                results.append(result)
-            except Exception:
-                continue
-                
-        return results
+        # Process text through pipeline
+        processed_text = text
+        
+        if self.config.semantic_noise:
+            processed_text = semantic_proc.process(processed_text, self.config)
+            logging.info(f"Applied semantic processing: {self.config.semantic_method}")
+            
+        if self.config.syntactic_noise > 0:
+            processed_text = syntactic_proc.process(processed_text, self.config)
+            logging.info(f"Applied syntactic processing: {self.config.syntactic_method}")
+        
+        # Generate final image
+        return image_proc.process(processed_text, self.config)

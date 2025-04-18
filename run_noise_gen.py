@@ -44,12 +44,25 @@ def create_comparison_image(images, texts, title="Noise Comparison"):
 def main():
     parser = argparse.ArgumentParser(description='Generate noisy text images')
     parser.add_argument('text', help='Text to render')
-    parser.add_argument('--noise-type', choices=[t.name for t in NoiseType], 
-                      default='STEGANOGRAPHIC', help='Type of noise to apply')
+    
+    # Method selection arguments
+    parser.add_argument('--semantic', choices=['REGEX', 'NONE'],
+                      default='NONE', help='Semantic noise method')
+    parser.add_argument('--syntactic', 
+                       choices=['KOLMOGOROV', 'SHUFFLE', 'NONE'],
+                       default='NONE', 
+                       help='Syntactic noise method')
+    parser.add_argument('--image-noise', choices=['SPECKLE', 'POINT_CLOUD', 'NONE'],
+                      default='NONE', help='Image noise method')
+    
+    # Noise levels
     parser.add_argument('--noise-level', type=float, default=0.5,
                       help='Noise level (0.0-1.0)')
-    parser.add_argument('--semantic', action='store_true',
-                      help='Enable semantic noise')
+    
+    # Image replacement
+    parser.add_argument('--image-replace', action='store_true',
+                      help='Use image replacement mode')
+    
     parser.add_argument('--output-dir', default='outputs',
                       help='Output directory')
     parser.add_argument('--compare-levels', action='store_true',
@@ -71,8 +84,10 @@ def main():
         for level in noise_levels:
             config = JamConfig(
                 syntactic_noise=level,
-                semantic_noise=args.semantic,
-                noise_type=NoiseType[args.noise_type]
+                semantic_method=args.semantic,
+                syntactic_method=args.syntactic,
+                image_method=args.image_noise,
+                use_image_replace=args.image_replace
             )
             generator = NoiseGenerator(config)
             img = generator.generate(args.text)
@@ -91,7 +106,10 @@ def main():
         
         config = JamConfig(
             syntactic_noise=args.noise_level,
-            semantic_noise=args.semantic
+            semantic_method=args.semantic,
+            syntactic_method=args.syntactic,
+            image_method=args.image_noise,
+            use_image_replace=args.image_replace
         )
         
         for noise_type in NoiseType:
@@ -113,8 +131,10 @@ def main():
         # Generate single image with specified settings
         config = JamConfig(
             syntactic_noise=args.noise_level,
-            semantic_noise=args.semantic,
-            noise_type=NoiseType[args.noise_type]
+            semantic_method=args.semantic,
+            syntactic_method=args.syntactic,
+            image_method=args.image_noise,
+            use_image_replace=args.image_replace
         )
         generator = NoiseGenerator(config)
         img = generator.generate(args.text)

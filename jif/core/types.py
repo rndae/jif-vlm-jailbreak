@@ -20,3 +20,11 @@ class JamConfig:
     point_density: float = 0.5
     use_list_format: bool = False
     extra_params: Optional[Dict[str, Any]] = None
+    
+    # Add new processor configuration
+    semantic_method: str = "NONE"
+    syntactic_method: str = "NONE"
+    image_method: str = "NONE"
+    
+    # For image replacement
+    use_image_replace: bool = False
