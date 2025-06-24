@@ -1,7 +1,9 @@
 
 # 🔓 JIF-VLM: Jailbreaking Multimodal Language Models via Multi-Level Noise
 
-![JIF-VLM Overview](https://github.com/user-attachments/assets/7379c2b5-e733-4dc5-93dd-24f628bdf41d)
+![JIF-VLM Overview](https://github.com/user-attachments/assets/5438ae56-f80e-4299-97dc-b4bfde89ff32)
+
+
 ## 🧠 Overview
 
 **JIF-VLM** introduces a novel and robust approach to jailbreaking **Multimodal Large Language Models (MLLMs)** for text-to-image generation. Inspired by FigStep and best-of-n sampling strategies, our method applies **multi-level noise transformations**—semantic, syntactic, and image-level—to bypass safety filters while preserving semantic intent.
